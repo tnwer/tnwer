@@ -12,7 +12,8 @@
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "stripe": "^15.6.0"
   },
   "name": "huproject",
   "version": "1.0.0",

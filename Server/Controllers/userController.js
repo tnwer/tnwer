@@ -1,4 +1,6 @@
 const userModel = require('../Model/user');
+const wishlistModel = require('../Model/wishlist');
+const productModel = require('../Model/product');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
@@ -153,18 +155,59 @@ async function deleteUser(req, res){
     }
 };
 
-// async function updateUserImage(req, res){
-//     try{
-//         const userID = req.user.id;
-//         const user_img = res.locals.site;
-//         const updateUser = await Users.findByPk(userID);
-//         await updateUser.update({user_img: user_img});
-//         res.status(201).json(updateUser);
-//     }catch(error){
-//         console.log(error);
-//         res.status(500).json('error in update User Image controller');
-//     }
-// };
+async function addToWishlist(req, res){
+    try{
+        const userID = '66350f9c54f679aba589a1ee';
+        const productID = req.params.id;
+        let wishlist = await wishlistModel.findOne({ user: userID });
+        if (!wishlist) {
+            wishlist = await wishlistModel.create({ user: userID, products: [] });
+        }
+        wishlist.products.push(productID);
+        await wishlist.save();
+        res.status(200).json({ message: 'Product added to wishlist successfully' });
+    } catch(error) {
+        console.error('Error in add to wishlist:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+async function getWishist(req, res){
+    try{
+        const userID = '66350f9c54f679aba589a1ee';
+        const wishlist = await wishlistModel.findOne().where({
+            user: userID,
+        });
+        const wishlistProducts = await productModel.find({ _id: { $in: wishlist.products } });
+        res.status(200).json(wishlistProducts);
+    }catch(error){
+        res.status(500).json('error in get wishlist');
+    }
+};
+
+async function deleteFromWishlist(req, res){
+    try{
+        const userID = '66350f9c54f679aba589a1ee';
+        const productID = req.params.id;
+        const wishlist = await wishlistModel.findOne({ user: userID });
+        console.log(wishlist);
+        if (wishlist) {
+            const index = wishlist.products.indexOf(productID);
+            if (index > -1) {
+                wishlist.products.splice(index, 1);
+                await wishlist.save();
+                res.status(200).json({ message: 'Product removed from wishlist successfully' });
+            } else {
+                res.status(404).json({ error: 'Product not found in wishlist' });
+            }
+        } else {
+            res.status(404).json({ error: 'Wishlist not found' });
+        }
+    } catch(error) {
+        console.error('Error in delete from wishlist:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 module.exports = {
     createUser,
@@ -174,10 +217,9 @@ module.exports = {
     getActiveUsers,
     deleteUser,
     updateUserData,
-    // getWishlist,
-    // gitOrderHistory,
-    // deleteOrder,
-    // updateUserImage,
+    addToWishlist,
+    getWishist,
+    deleteFromWishlist,
 };
 
 // async function getWishlist(req, res){

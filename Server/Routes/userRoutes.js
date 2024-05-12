@@ -12,4 +12,9 @@ router.get('/activeUsers', userControllers.getActiveUsers);
 router.put('/updateUser/:id',uploadImg.uploadImg, userControllers.updateUserData);
 router.put('/deleteUser/:id', userControllers.deleteUser);
 
+router.get('/wishlist', userControllers.getWishist);
+router.post('/addToWishlist/:id', userControllers.addToWishlist);
+router.delete('/deleteFromWishlist/:id', userControllers.deleteFromWishlist);
+
+
 module.exports = router;
