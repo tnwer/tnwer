@@ -28,7 +28,7 @@ function Aside({ activeTab, handleTabChange }) {
                 Profile
             </div>
 
-            <div className={`tab ${activeTab === 'prchase-history' && 'active'}`} onClick={() => handleTabChange('purchaseHistory')}>
+            <div className={`tab ${activeTab === 'purchase-history' && 'active'}`} onClick={() => handleTabChange('purchase-history')}>
                 <FontAwesomeIcon icon={faHistory} className="fa-light" style={{ color: '#5c5c5c', marginRight: '10px' }} />
                 Purchase History
             </div>

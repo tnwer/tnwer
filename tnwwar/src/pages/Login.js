@@ -8,6 +8,7 @@ function Login() {
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [generalError, setGeneralError] = useState('');
+    const [loginSuccess, setLoginSuccess] = useState('');
 
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -45,16 +46,17 @@ function Login() {
                 }),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const data = await response.json();
-                login(data.token);
+                // Login successful
+                login(data.accessToken); 
+                setLoginSuccess('Login successful!');
+                setGeneralError('');
                 navigate('/');
             } else {
-                const errorData = await response.json();
-                setGeneralError('Login failed. Please try again.');
-                if (errorData.password) {
-                    setPasswordError(errorData.password);
-                }
+                // Login failed
+                setGeneralError(data.error || 'Login failed. Please try again.');
             }
         } catch (error) {
             console.error('An error occurred:', error);
@@ -76,10 +78,10 @@ function Login() {
                             value={email}
                             onChange={handleEmailChange}
                         />
-                        {emailError && <p style={{ color: 'red' }}>{emailError}</p>} 
+                        {emailError && <p style={{ color: 'red' }}>{emailError}</p>}
                     </div>
 
-                    <div className='signin_input_group'> 
+                    <div className='signin_input_group'>
                         <label htmlFor='password'>Password</label>
                         <input
                             type='password'
@@ -88,13 +90,14 @@ function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
-                        {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>} 
+                        {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
                     </div>
 
                     <button type='submit' className='signin_button'>Login</button>
                 </form>
 
-                {generalError && <p style={{ color: 'red' }}>{generalError}</p>} 
+                {generalError && <p style={{ color: 'red' }}>{generalError}</p>}
+                {loginSuccess && <p style={{ color: 'green' }}>{loginSuccess}</p>}
 
                 <a href='#' className='signin_forgot_password'>Forgot password?</a>
                 <div className='signin_divider'>_________ New to Tnwar _________</div>

@@ -34,6 +34,7 @@ async function createUser (req, res){
                 user_email : user_email,
                 password : user_password,
                 user_location : user_location,
+                user_role: 1,
             });
             const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
             res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
@@ -58,7 +59,7 @@ async function loginUser (req, res){
       if (valid){
         const user = await userModel.findOne().where({user_email: user_email});
         console.log(user);
-          if (user && user.user_email === user_email) {
+          if (user && user.user_email === user_email && user.user_role == 1) {
                 bcrypt.compare(password , user.password, (error, result) => {
                     if (error) {
                         res.status(400).json(error);
@@ -87,7 +88,7 @@ async function getUserData(req, res){
         const userData = await userModel.findById(userID);
         res.status(200).json(userData);
     }catch(error){
-        res.status(500).json('error in get user data');
+        res.status(500).json({error: 'error in get user data'});
     }
 };
 
@@ -98,7 +99,7 @@ async function getAllUsers(req, res){
         });
         res.status(200).json({users : allUsers});
     }catch(error){
-        res.status(500).json('error in get user data');
+        res.status(500).json({error: 'error in get user data'});
     }
 };
 
@@ -110,7 +111,7 @@ async function getActiveUsers(req, res){
         });
         res.status(200).json({ activeUsers });
     }catch(error){
-        res.status(500).json('error in get active Users');
+        res.status(500).json({error: 'error in get active Users'});
     }
 };
 
@@ -137,7 +138,7 @@ async function updateUserData(req, res) {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json('Error in updating user data');
+        res.status(500).json({error: 'Error in updating user data'});
     }
 };
 
@@ -151,13 +152,13 @@ async function deleteUser(req, res){
         res.status(201).json({ deletedUser });
     }catch(error){
         console.log(error);
-        res.status(500).json("error in delete user");
+        res.status(500).json({error: "error in delete user"});
     }
 };
 
 async function addToWishlist(req, res){
     try{
-        const userID = '66350f9c54f679aba589a1ee';
+        const userID = req.user.id;
         const productID = req.params.id;
         let wishlist = await wishlistModel.findOne({ user: userID });
         if (!wishlist) {
@@ -174,20 +175,20 @@ async function addToWishlist(req, res){
 
 async function getWishist(req, res){
     try{
-        const userID = '66350f9c54f679aba589a1ee';
+        const userID = req.user.id;
         const wishlist = await wishlistModel.findOne().where({
             user: userID,
         });
         const wishlistProducts = await productModel.find({ _id: { $in: wishlist.products } });
         res.status(200).json(wishlistProducts);
     }catch(error){
-        res.status(500).json('error in get wishlist');
+        res.status(500).json({error: 'error in get wishlist'});
     }
 };
 
 async function deleteFromWishlist(req, res){
     try{
-        const userID = '66350f9c54f679aba589a1ee';
+        const userID = req.user.id;
         const productID = req.params.id;
         const wishlist = await wishlistModel.findOne({ user: userID });
         console.log(wishlist);
@@ -209,6 +210,157 @@ async function deleteFromWishlist(req, res){
     }
 };
 
+async function createSeller (req, res){
+    try {
+      const { user_name, user_email, password, phone_number, user_location, Commercial_Record} = req.body;
+      const valid = validation(user_name, user_email, password, phone_number);
+      if (valid){
+          let user_password = await bcrypt.hash(password, 10);
+          try{
+              const newUser = await userModel.create({
+                  user_name : user_name,
+                  user_email : user_email,
+                  password : user_password,
+                  user_location : user_location,
+                  user_role: 2,
+                  Commercial_Record: Commercial_Record,
+              });
+              const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+              res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
+              res.status(201).json({ accessToken });
+          }catch(error){
+              res.status(400).json("the Email is already exist!");
+          }
+      }else {
+          console.log("Invalid inputs");
+          res.status(400).json("Invalid inputs");
+      }
+    } catch (error) {
+      console.log(error)
+          res.status(500).json({ error: 'Error in user model createUser' });
+    }
+};
+
+async function loginSeller (req, res){
+    try {
+      const { user_email, password } = req.body;
+      const valid = validation("userName", user_email, password, "12345678910");
+      if (valid){
+        const user = await userModel.findOne().where({user_email: user_email});
+        console.log(user);
+          if (user && user.user_email === user_email && user.user_role == 2) {
+                bcrypt.compare(password , user.password, (error, result) => {
+                    if (error) {
+                        res.status(400).json(error);
+                    } else if (result) {
+                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+                        res.cookie('accessToken', accessToken, { httpOnly: true });
+                        res.status(200).json({ accessToken });
+                    } else {
+                        res.status(400).json('incorrect password');
+                    }
+                });
+          }else {
+            res.status(401).json({ error: 'Email not found' });
+          }
+      } else {
+            res.status(400).json("Invalid inputs");
+      }
+    }catch (error) {
+        res.status(500).json({ error: 'server error' });
+    }
+};
+
+async function loginAdmin (req, res){
+    try {
+      const { email, password } = req.body;
+      const valid = validation("userName", email, password, "12345678910");
+      if (valid){
+        const user = await userModel.findOne().where({user_email: email});
+        console.log(user);
+          if (user && user.user_email === email && user.user_role == 3) {
+                bcrypt.compare(password , user.password, (error, result) => {
+                    if (error) {
+                        res.status(400).json(error);
+                    } else if (result) {
+                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+                        res.cookie('accessToken', accessToken, { httpOnly: true });
+                        res.status(200).json({ accessToken });
+                    } else {
+                        res.status(400).json('incorrect password');
+                    }
+                });
+          }else {
+            res.status(401).json({ error: 'Email not found' });
+          }
+      } else {
+            res.status(400).json("Invalid inputs");
+      }
+    }catch (error) {
+        res.status(500).json({ error: 'server error' });
+    }
+};
+
+async function loginUser (req, res){
+    try {
+      const { user_email, password } = req.body;
+      const valid = validation("userName", user_email, password, "12345678910");
+      if (valid){
+        const user = await userModel.findOne().where({user_email: user_email});
+        console.log(user);
+          if (user && user.user_email === user_email && user.user_role == 1) {
+                bcrypt.compare(password , user.password, (error, result) => {
+                    if (error) {
+                        res.status(400).json(error);
+                    } else if (result) {
+                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+                        res.cookie('accessToken', accessToken, { httpOnly: true });
+                        res.status(200).json({ accessToken });
+                    } else {
+                        res.status(400).json('incorrect password');
+                    }
+                });
+          }else {
+            res.status(401).json({ error: 'Email not found' });
+          }
+      } else {
+            res.status(400).json("Invalid inputs");
+      }
+    }catch (error) {
+        res.status(500).json({ error: 'server error' });
+    }
+};
+
+async function createAdmin(req, res){
+    try {
+      const { user_name, user_email, password, phone_number, user_location, Commercial_Record} = req.body;
+      const valid = validation(user_name, user_email, password, phone_number);
+      if (valid){
+          let user_password = await bcrypt.hash(password, 10);
+          try{
+              const newUser = await userModel.create({
+                  user_name : user_name,
+                  user_email : user_email,
+                  password : user_password,
+                  user_location : user_location,
+                  user_role: 3,
+              });
+              const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+              res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
+              res.status(201).json({ accessToken });
+          }catch(error){
+              res.status(400).json("the Email is already exist!");
+          }
+      }else {
+          console.log("Invalid inputs");
+          res.status(400).json("Invalid inputs");
+      }
+    } catch (error) {
+      console.log(error)
+          res.status(500).json({ error: 'Error in user model createUser' });
+    }
+};
+
 module.exports = {
     createUser,
     loginUser,
@@ -220,84 +372,8 @@ module.exports = {
     addToWishlist,
     getWishist,
     deleteFromWishlist,
+    createSeller,
+    loginSeller,
+    loginAdmin,
+    createAdmin
 };
-
-// async function getWishlist(req, res){
-//     try{
-//         const userID = req.user.id;
-//         const wishlist = await Wishlist.findAll({
-//             where: {
-//                 user_wishlist_id: userID,
-//             },
-//             include: [
-//                 {
-//                     model: Products,
-//                     attributes: ['product_id', 'product_name', 'description', 'price', 'product_rating', 'img_url'],
-//                 },
-//             ],
-//         });
-//         res.status(200).json(wishlist);
-//     }catch(error){
-//         console.log(error)
-//         res.status(500).json('error in get wishlist');
-//     }
-// };
-
-// async function gitOrderHistory(req, res) {
-//     try {
-//         const userID = req.user.id;
-//         const ordersHistory = await Order.findAll({
-//             where: {
-//                 user_order_id: userID,
-//                 is_payed: true,
-//             },
-//             include: [
-//                 {
-//                     model: Products,
-//                     as: "product",
-//                     attributes: ['product_id', 'product_name', 'price', 'product_rating', 'img_url', 'description'],
-//                 },
-//                 {
-//                     model: Recipient,
-//                     as: "recipient",
-//                     attributes: ['recipient_name', 'recipient_location', 'recipient_phone_number'],
-//                 }
-//             ],
-//         });
-
-//         // Sort orders based on createdAt attribute
-//         ordersHistory.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-//         // Group orders by day
-//         const groupedOrders = ordersHistory.reduce((acc, order) => {
-//             const orderDate = new Date(order.createdAt).toLocaleDateString();
-//             const index = acc.findIndex(group => group[0] && new Date(group[0].createdAt).toLocaleDateString() === orderDate);
-
-//             if (index !== -1) {
-//                 acc[index].push(order);
-//             } else {
-//                 acc.push([order]);
-//             }
-//             return acc;
-//         }, []);
-//         res.status(200).json(groupedOrders);
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json('error in git order history');
-//     }
-// };
-
-// async function deleteOrder(req, res){
-//     try{
-//         const { orderID } = req.body;
-//         const deleteOrder = await Order.findByPk(orderID);
-//         // if(){
-
-//         // }
-//         await deleteOrder.update({is_deleted : true, is_delivered : true});
-//         res.status(201).json(deleteOrder);
-//     }catch(error){
-//         console.log(error);
-//         res.status(500).json('error in delete order controller');
-//     }
-// };

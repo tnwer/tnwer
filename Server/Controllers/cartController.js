@@ -3,7 +3,7 @@ const productModel = require('../Model/product');
 
 async function getCartInfo(req, res){
     try{
-        const userID = "66350f9c54f679aba589a1ee";
+        const userID = req.user.id;
         const userCart = await cartModel.find({
             cart_user_id: userID,
             is_deleted: false,
@@ -12,13 +12,13 @@ async function getCartInfo(req, res){
         res.status(200).json(userCart);
     }catch(error){
         console.log(error);
-        res.status(500).json("error in get Cart Info");
+        res.status(500).json({error: "error in get Cart Info"});
     }
 };
 
 async function cartIncrement(req, res){
     try{
-        const userID = "66350f9c54f679aba589a1ee";
+        const userID = req.user.id;
         const productID = req.params.id;
         const theProduct = await productModel.findById(productID);
         const productInCart = await cartModel.findOne().where({
@@ -47,13 +47,13 @@ async function cartIncrement(req, res){
         }
     }catch(error){
         console.log(error);
-        res.status(500).json("error in cart Increment");
+        res.status(500).json({error: "error in cart Increment"});
     }
 };
 
 async function cartDecrement(req, res){
     try{
-        const userID = "66350f9c54f679aba589a1ee";
+        const userID = req.user.id;
         const productID = req.params.id;
         const theProduct = await productModel.findById(productID);
         const productInCart = await cartModel.findOne().where({
@@ -75,7 +75,7 @@ async function cartDecrement(req, res){
         }
     }catch(error){
         console.log(error);
-        res.status(500).json("error in cart Decrement");
+        res.status(500).json({error: "error in cart Decrement"});
     }
 };
 

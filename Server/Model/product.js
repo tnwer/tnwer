@@ -23,6 +23,10 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
+    shop_name: {
+        type: String,
+        required: true
+    },
     is_deleted: {
         type: Boolean,
         default: false

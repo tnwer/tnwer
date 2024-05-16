@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+// ProductCarousel.js
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom'; 
-import ProductCard from '../cards/ProductCard';
+import { Link } from 'react-router-dom';
+import ProductCard from './../cards/ProductCard';
 
 function ProductCarousel() {
     const [products, setProducts] = useState([]);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const carouselRef = useRef(null);
 
     useEffect(() => {
         axios.get('http://localhost:8080/allProducts')
@@ -16,37 +19,42 @@ function ProductCarousel() {
             });
     }, []);
 
-   
-    const groupedProducts = [];
-    for (let i = 0; i < products.length; i += 4) {
-        groupedProducts.push(products.slice(i, i + 5)); 
-    }
+    // Chunk function to split array into groups
+    const chunkArray = (arr, size) => {
+        const chunkedArr = [];
+        for (let i = 0; i < arr.length; i += size) {
+            chunkedArr.push(arr.slice(i, i + size));
+        }
+        return chunkedArr;
+    };
+
+    const groupedProducts = chunkArray(products, 4);
+
+    const handleNext = () => {
+        setCurrentSlide((prev) => (prev === groupedProducts.length - 1 ? 0 : prev + 1));
+    };
+
+    const handlePrev = () => {
+        setCurrentSlide((prev) => (prev === 0 ? groupedProducts.length - 1 : prev - 1));
+    };
 
     return (
-        <div className="container p-3 mx-4">
-            <div id="productCarousel" className="carousel slide small-carousel" data-bs-ride="carousel">
-                <div className="carousel-inner">
-                    {groupedProducts.map((group, index) => (
-                        <div key={index} className={`carousel-item${index === 0 ? ' active' : ''}`}>
-                            <div className="d-flex justify-content-around">
-                                {group.map((product, productIndex) => (
-                                    <Link key={productIndex} to={`/productDetails/${product._id}`}>
-                                        <ProductCard product={product} />
-                                    </Link>
-                                ))}
-                            </div>
+        <div className="product-carousel">
+            <div className="carousel" ref={carouselRef} style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                {groupedProducts.map((group, index) => (
+                    <div key={index} className="slide">
+                        <div className="slide-content">
+                            {group.map((product, productIndex) => (
+                                <Link key={productIndex} to={`/productDetails/${product._id}`}>
+                                    <ProductCard product={product} />
+                                </Link>
+                            ))}
                         </div>
-                    ))}
-                </div>
-                <button className="carousel-control-prev small-carousel-control" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span className="visually-hidden">Previous</span>
-                </button>
-                <button className="carousel-control-next small-carousel-control" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span className="visually-hidden">Next</span>
-                </button>
+                    </div>
+                ))}
             </div>
+            <button className="prev-btn" onClick={handlePrev}>&#10094;</button>
+            <button className="next-btn" onClick={handleNext}>&#10095;</button>
         </div>
     );
 }
