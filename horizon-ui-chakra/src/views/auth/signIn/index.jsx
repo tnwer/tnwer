@@ -41,8 +41,8 @@ function SignIn() {
       if (response.ok) {
         const data = await response.json();
         console.log("Login successful:", data);
-        Cookies.set('accessToken', data.accessToken, { expires: 1 });
-        window.location.href = 'http://localhost:3000/horizon-ui-chakra#/admin/default'
+        Cookies.set('AdminAccessToken', data.accessToken, { expires: 1 });
+        window.location.href = 'http://localhost:3001/horizon-ui-chakra#/admin/default'
       } else {
         const errorData = await response.json();
         console.error("Login failed");

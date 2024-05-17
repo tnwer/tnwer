@@ -10,6 +10,7 @@ const userRoutes = require('./Routes/userRoutes');
 const productRoutes = require('./Routes/productRoutes');
 const cartRoutes = require('./Routes/cartRoutes');
 const paymentRoutes = require('./Routes/paymentRoutes');
+const reactionroutes = require('./Routes/reactionRoutes');
 
 require('dotenv').config();
 app.use(express.json());
@@ -21,6 +22,7 @@ app.use(userRoutes);
 app.use(productRoutes);
 app.use(cartRoutes);
 app.use(paymentRoutes);
+app.use(reactionroutes);
 
 // mongoose.connect(process.env.MONGODB_URI);
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -67,3 +69,5 @@ app.listen(process.env.PORT, () => {
 // const category = require('./Model/category');
 // const discount = require('./Model/discount');
 // const wishlist = require('./Model/wishlist');
+// const comment = require('./Model/comment');
+// const rating = require('./Model/rating');

@@ -7,7 +7,7 @@ async function addProduct(req, res){
     try{
         const userID = req.user.id;
         const user_img = res.locals.site;
-        const {product_name, description, price, product_category, product_count, product_location} = req.body;
+        const {product_name, description, price, product_category, product_count, product_location, shop_name} = req.body;
         const owner = await userModel.findById(userID);
         const category = await categoryModel.findOne({ category_name: product_category });
         const newProduct = await productModel.create({
@@ -19,6 +19,7 @@ async function addProduct(req, res){
             product_count: product_count,
             product_owner: owner,
             product_location: product_location,
+            shop_name: shop_name,
         });
         res.status(201).json(newProduct);
     }catch(error){

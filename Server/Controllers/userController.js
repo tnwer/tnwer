@@ -35,6 +35,7 @@ async function createUser (req, res){
                 password : user_password,
                 user_location : user_location,
                 user_role: 1,
+                phone_number: phone_number || '07777777777',
             });
             const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
             res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
@@ -224,6 +225,7 @@ async function createSeller (req, res){
                   user_location : user_location,
                   user_role: 2,
                   Commercial_Record: Commercial_Record,
+                  phone_number: phone_number || '07777777777',
               });
               const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
               res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
@@ -344,6 +346,7 @@ async function createAdmin(req, res){
                   password : user_password,
                   user_location : user_location,
                   user_role: 3,
+                  phone_number: phone_number || '07777777777',
               });
               const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
               res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });

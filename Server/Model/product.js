@@ -25,7 +25,7 @@ const productSchema = new Schema({
     },
     shop_name: {
         type: String,
-        required: true
+        required: false
     },
     is_deleted: {
         type: Boolean,
@@ -50,7 +50,13 @@ const productSchema = new Schema({
         ref: 'Discount',
         default: null,
         required: false,
-    }
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 5
+    },
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

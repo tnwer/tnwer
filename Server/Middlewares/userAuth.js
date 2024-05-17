@@ -5,10 +5,9 @@ const logger = require('../log/logger');
 async function authorize(req, res, next) {
     try {
         const authHeader = req.headers.authorization;
-        if (authHeader && authHeader.startsWith('Bearer ')) {
+        if (authHeader) {
             const token = authHeader.split(' ')[1];
             const user = jwt.verify(token, process.env.SECRET_KEY);
-            logger.info(`user: ${user.id}`);
             if (user.id) {
                 req.user = user;
                 next();

@@ -3,7 +3,7 @@ import { Route, Redirect } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 const ProtectedRoute = ({ component: Component, ...rest }) => {
-  const isAuthenticated = !!Cookies.get('accessToken'); // Check if token exists
+  const isAuthenticated = !!Cookies.get('AdminAccessToken'); // Check if token exists
 
   return (
     <Route

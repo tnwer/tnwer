@@ -1,20 +1,24 @@
 export const columnsDataDevelopment = [
-  {
-    Header: "NAME",
-    accessor: "name",
-  },
-  {
-    Header: "TECH",
-    accessor: "tech",
-  },
-  {
-    Header: "DATE",
-    accessor: "date",
-  },
-  {
-    Header: "PROGRESS",
-    accessor: "progress",
-  },
+    {
+        Header: "user name",
+        accessor: "user_name",
+      },
+      {
+        Header: "email",
+        accessor: "user_email",
+      },
+      {
+        Header: "location",
+        accessor: "user_location",
+      },
+      {
+        Header: "phone number",
+        accessor: "phone_number",
+      },
+      {
+        Header: "Commercial Record",
+        accessor: "Commercial_Record",
+      },
 ];
 
 export const columnsDataCheck = [
@@ -37,22 +41,22 @@ export const columnsDataCheck = [
 ];
 
 export const columnsDataColumns = [
-  {
-    Header: "NAME",
-    accessor: "name",
-  },
-  {
-    Header: "PROGRESS",
-    accessor: "progress",
-  },
-  {
-    Header: "QUANTITY",
-    accessor: "quantity",
-  },
-  {
-    Header: "DATE",
-    accessor: "date",
-  },
+    {
+        Header: "user name",
+        accessor: "user_name",
+      },
+      {
+        Header: "email",
+        accessor: "user_email",
+      },
+      {
+        Header: "location",
+        accessor: "user_location",
+      },
+      {
+        Header: "phone number",
+        accessor: "phone_number",
+      },
 ];
 
 export const columnsDataComplex = [

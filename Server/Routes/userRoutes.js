@@ -14,7 +14,7 @@ router.post('/sellerSignUp', userControllers.createSeller);
 router.post('/userLogin', userControllers.createUser);
 router.post('/userRegister', userControllers.loginUser);
 
-router.get('/allUsers', adminAuth.authorize,userControllers.getAllUsers);
+router.get('/allUsers', userControllers.getAllUsers);
 router.get('/profilePage', userAuth.authorize, userControllers.getUserData);
 router.get('/activeUsers', adminAuth.authorize, userControllers.getActiveUsers);
 router.put('/updateUser/:id', userAuth.authorize,
