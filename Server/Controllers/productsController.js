@@ -44,7 +44,7 @@ async function getProductDetails(req, res){
         const productID = req.params.id;
         const productDetails = await productModel.findById(productID).where({
             is_deleted: false,
-        }).populate('product_category').populate('discount');
+        }).populate('product_category').populate('discount').populate('comments');
 
         const userID = req.headers.user || null;
         let location;
@@ -60,7 +60,7 @@ async function getProductDetails(req, res){
             product_category: productDetails.product_category,
             _id: { $ne: productDetails._id },
             product_name: { $regex: productName } 
-        });
+        }).limit(4);
 
         const price = productDetails.price;
         const bestOfProduct = await productModel.find({
@@ -68,9 +68,9 @@ async function getProductDetails(req, res){
             product_location: location,
             _id: { $ne: productDetails._id },
             price: { $lt: price }
-        }).sort({ price: 1 });
+        }).sort({ price: 1 }).limit(3);
 
-        res.status(200).json({ productDetails, relatedProducts, bestOfProduct });
+        res.status(200).json({ productDetails, relatedProducts, bestOfProduct , userID});
     } catch(error){
         console.error(error);
         res.status(500).json({error: "Error in get Details"});

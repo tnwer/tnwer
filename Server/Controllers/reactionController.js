@@ -67,7 +67,13 @@ async function addComment(req, res){
             comment_user: userID
         });
         await newComment.save();
-        res.status(201).json(newComment);
+        const addCommentToProduct = await productModel.findByIdAndUpdate(
+            productID,
+            { $push: { comments: newComment._id } },
+            { new: true, useFindAndModify: false }
+        );
+        addCommentToProduct.save();
+        res.status(201).json({newComment, addCommentToProduct});
     }catch(error){
         console.log(error);
         res.status(500).json('error in add comment');

@@ -53,10 +53,14 @@ const productSchema = new Schema({
     },
     rating: {
         type: Number,
-        required: true,
+        required: false,
         min: 0,
         max: 5
     },
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
+    }]
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
