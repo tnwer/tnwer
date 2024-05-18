@@ -52,7 +52,7 @@ async function addRating(req, res){
         }
     }catch(error){
         console.log(error);
-        res.status(500).json('error in add rating');
+        res.status(500).json({error: 'error in add rating'});
     }
 };
 
@@ -76,7 +76,7 @@ async function addComment(req, res){
         res.status(201).json({newComment, addCommentToProduct});
     }catch(error){
         console.log(error);
-        res.status(500).json('error in add comment');
+        res.status(500).json({error: 'error in add comment'});
     }
 };
 

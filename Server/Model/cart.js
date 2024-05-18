@@ -4,26 +4,26 @@ const { Schema } = mongoose;
 const cartSchema = new Schema({
     cart_user_id: {
         type: Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
+        ref: 'User',
         required: true
     },
     cart_product: {
         type: Schema.Types.ObjectId,
-        ref: 'Product', // Reference to the Product model
+        ref: 'Product',
         required: true
     },
     quantity: {
         type: Number,
         required: false,
-        default: 1 // Default count if not provided
+        default: 1 
     },
     is_deleted: {
         type: Boolean,
-        default: false // Default value if not provided
+        default: false 
     },
     is_payed: {
         type: Boolean,
-        default: false // Default value if not provided
+        default: false 
     }
 }, { timestamps: true });
 

@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const visaCardSchema = new Schema({
     card_id: {
         type: Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
+        ref: 'User',
         required: true,
         unique: true
     },

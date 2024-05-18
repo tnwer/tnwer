@@ -10,8 +10,8 @@ async function OrdersHistory(req, res){
         const payments = await paymentModel.find().where({
              payment_user_id: userID 
             }).populate({
-                path: 'product_id', // Populate the product_id field within payment_products array
-                model: 'Product' // Name of the referenced model
+                path: 'product_id',
+                model: 'Product'
             });
         res.status(200).json(payments); 
     } catch(error) {
@@ -71,24 +71,15 @@ async function afterPayment(req, res){
         const userID = req.query.userID;
         const total = req.query.total;
         const orders = await cartModel.find({ _id: { $in: orderIds } });
-
-        // console.log(222222,orders);
-
-        // Prepare payment products array
         const paymentProducts = orders.map(order => ({
-            product_id: order.cart_product, // Assuming you have product_id in your cart
-            quantity: order.quantity // Assuming you have quantity in your cart
+            product_id: order.cart_product,
+            quantity: order.quantity 
         }));
-
-        // Update orders to mark them as paid and deleted
         for(let i = 0; i < orders.length; i++){
             orders[i].is_deleted = true;
             orders[i].is_payed = true;
             await orders[i].save();
         };
-
-        // console.log(111111,paymentProducts);
-        // Create payment record
         for(let i = 0; i < orders.length; i++){
             const payment = await paymentModel.create({
                 payment_At: new Date(),

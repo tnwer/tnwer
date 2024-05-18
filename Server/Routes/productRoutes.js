@@ -9,12 +9,11 @@ const uploadImg = require('../Middlewares/imgUpload');
 router.post('/addProduct', sellerAuth.authorize, uploadImg.uploadImg, productControllers.addProduct);
 router.get('/allProducts', productControllers.getAllProducts);
 router.get('/productDetails/:id', productControllers.getProductDetails);
-router.put('/updateProduct/:id',
-                userAuth.authorize, uploadImg.uploadImg, productControllers.updateProduct);
+router.put('/updateProduct/:id', sellerAuth.authorize, uploadImg.uploadImg, productControllers.updateProduct);
 router.put('/deleteProduct/:id', userAuth.authorize, productControllers.deleteProduct);
+
 router.post('/addDiscount/:id', sellerAuth.authorize, productControllers.addDiscount);
 router.put('/deleteDescount/:id', sellerAuth.authorize, productControllers.deleteDiscount);
-router.get('/deletedProducts/:id', userAuth.authorize, productControllers.deleteProduct);
 
 router.get('/getCategory', categoryController.getCategory);
 router.post('/addCategory', uploadImg.uploadImg, categoryController.addCategory);

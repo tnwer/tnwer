@@ -55,7 +55,8 @@ const productSchema = new Schema({
         type: Number,
         required: false,
         min: 0,
-        max: 5
+        max: 5,
+        default: 0
     },
     comments: [{
         type: Schema.Types.ObjectId,

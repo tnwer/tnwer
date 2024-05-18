@@ -27,7 +27,6 @@ async function cartIncrement(req, res){
             is_deleted: false,
             is_payed: false,
         });
-        // console.log(productInCart);
         if (productInCart && productInCart.quantity >= 1 && productInCart.quantity < theProduct.product_count){
             productInCart.quantity++;
             await productInCart.save();

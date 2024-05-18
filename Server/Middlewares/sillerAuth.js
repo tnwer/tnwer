@@ -9,7 +9,7 @@ async function authorize(req, res, next) {
             const token = authHeader.split(' ')[1];
             const user = jwt.verify(token, process.env.SECRET_KEY);
             logger.info(`user: ${user.id}`);
-            if (user.id && user.user_role == 2) {
+            if (user.id && user.role == 2) {
                 req.user = user;
                 next();
             } else {

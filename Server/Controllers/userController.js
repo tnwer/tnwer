@@ -22,7 +22,7 @@ const valid = schema.validate({user_name, user_email, password, phone_number});
     }
 };
 
-async function createUser (req, res){
+async function createUser(req, res){
   try {
     const { user_name, user_email, password, phone_number, user_location} = req.body;
     const valid = validation(user_name, user_email, password, phone_number);
@@ -37,7 +37,8 @@ async function createUser (req, res){
                 user_role: 1,
                 phone_number: phone_number || '07777777777',
             });
-            const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+            const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role},
+                                             process.env.SECRET_KEY, {expiresIn: '6h'});
             res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
             res.status(201).json({ accessToken });
         }catch(error){
@@ -53,19 +54,19 @@ async function createUser (req, res){
   }
 };
 
-async function loginUser (req, res){
+async function loginUser(req, res){
     try {
       const { user_email, password } = req.body;
       const valid = validation("userName", user_email, password, "12345678910");
       if (valid){
         const user = await userModel.findOne().where({user_email: user_email});
-        console.log(user);
           if (user && user.user_email === user_email && user.user_role == 1) {
                 bcrypt.compare(password , user.password, (error, result) => {
                     if (error) {
                         res.status(400).json(error);
-                    } else if (result) {
-                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+                    } else if (result && user.is_deleted === false) {
+                        const accessToken = jwt.sign({id : user._id, role : user.user_role},
+                                                        process.env.SECRET_KEY, {expiresIn: '6h'});
                         res.cookie('accessToken', accessToken, { httpOnly: true });
                         res.status(200).json({ accessToken });
                     } else {
@@ -139,10 +140,8 @@ async function updateUserData(req, res) {
 async function deleteUser(req, res){
     try{
         const userID = req.params.id;
-        console.log(userID);
         const deletedUser = await userModel.findById(userID);
         deletedUser.is_deleted = true;
-        console.log(deletedUser);
         res.status(201).json({ deletedUser });
     }catch(error){
         console.log(error);
@@ -185,7 +184,6 @@ async function deleteFromWishlist(req, res){
         const userID = req.user.id;
         const productID = req.params.id;
         const wishlist = await wishlistModel.findOne({ user: userID });
-        console.log(wishlist);
         if (wishlist) {
             const index = wishlist.products.indexOf(productID);
             if (index > -1) {
@@ -204,7 +202,7 @@ async function deleteFromWishlist(req, res){
     }
 };
 
-async function createSeller (req, res){
+async function createSeller(req, res){
     try {
       const { user_name, user_email, password, phone_number, user_location, Commercial_Record} = req.body;
       const valid = validation(user_name, user_email, password, phone_number);
@@ -219,6 +217,7 @@ async function createSeller (req, res){
                   user_role: 2,
                   Commercial_Record: Commercial_Record,
                   phone_number: phone_number || '07777777777',
+                  is_deleted: true,
               });
               const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
               res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
@@ -236,23 +235,22 @@ async function createSeller (req, res){
     }
 };
 
-async function loginSeller (req, res){
+async function loginSeller(req, res){
     try {
       const { user_email, password } = req.body;
       const valid = validation("userName", user_email, password, "12345678910");
       if (valid){
         const user = await userModel.findOne().where({user_email: user_email});
-        console.log(user);
           if (user && user.user_email === user_email && user.user_role == 2) {
                 bcrypt.compare(password , user.password, (error, result) => {
                     if (error) {
                         res.status(400).json(error);
-                    } else if (result) {
+                    } else if (result && user.is_deleted === false) {
                         const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
                         res.cookie('accessToken', accessToken, { httpOnly: true });
                         res.status(200).json({ accessToken });
                     } else {
-                        res.status(400).json('incorrect password');
+                        res.status(400).json('incorrect password or your account still not active');
                     }
                 });
           }else {
@@ -266,19 +264,19 @@ async function loginSeller (req, res){
     }
 };
 
-async function loginAdmin (req, res){
+async function loginAdmin(req, res){
     try {
       const { email, password } = req.body;
       const valid = validation("userName", email, password, "12345678910");
       if (valid){
         const user = await userModel.findOne().where({user_email: email});
-        console.log(user);
           if (user && user.user_email === email && user.user_role == 3) {
                 bcrypt.compare(password , user.password, (error, result) => {
                     if (error) {
                         res.status(400).json(error);
-                    } else if (result) {
-                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '4h'});
+                    } else if (result && user.is_deleted === false) {
+                        const accessToken = jwt.sign({id : user._id, role : user.user_role},
+                                                         process.env.SECRET_KEY, {expiresIn: '4h'});
                         res.cookie('accessToken', accessToken, { httpOnly: true });
                         res.status(200).json({ accessToken });
                     } else {
@@ -296,19 +294,19 @@ async function loginAdmin (req, res){
     }
 };
 
-async function loginUser (req, res){
+async function loginUser(req, res){
     try {
       const { user_email, password } = req.body;
       const valid = validation("userName", user_email, password, "12345678910");
       if (valid){
         const user = await userModel.findOne().where({user_email: user_email});
-        console.log(user);
           if (user && user.user_email === user_email && user.user_role == 1) {
                 bcrypt.compare(password , user.password, (error, result) => {
                     if (error) {
                         res.status(400).json(error);
-                    } else if (result) {
-                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+                    } else if (result && user.is_deleted === false) {
+                        const accessToken = jwt.sign({id : user._id, role : user.user_role},
+                                                     process.env.SECRET_KEY, {expiresIn: '6h'});
                         res.cookie('accessToken', accessToken, { httpOnly: true });
                         res.status(200).json({ accessToken });
                     } else {
@@ -341,7 +339,8 @@ async function createAdmin(req, res){
                   user_role: 3,
                   phone_number: phone_number || '07777777777',
               });
-              const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+              const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role},
+                                             process.env.SECRET_KEY, {expiresIn: '6h'});
               res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
               res.status(201).json({ accessToken });
           }catch(error){
@@ -354,6 +353,31 @@ async function createAdmin(req, res){
     } catch (error) {
       console.log(error)
           res.status(500).json({ error: 'Error in user model createUser' });
+    }
+};
+
+async function acceptSeller(req, res){
+    try{
+        const sellerID = req.params.id;
+        const acceptedSeller = await userModel.findById(sellerID);
+        acceptedSeller.is_deleted = false;
+        acceptedSeller.save();
+        res.status(201).json(acceptedSeller);
+    }catch(error){
+        console.log(error);
+        res.status().json({error: "error in accept seller"});
+    }
+};
+
+async function getSellersRequests(req, res){
+    try{
+        const sellersRequests = await userModel.find().where({
+            is_deleted: true,
+        });
+        res.status(200).json(sellersRequests);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: "error in get Sellers Requests"})
     }
 };
 
@@ -371,5 +395,7 @@ module.exports = {
     createSeller,
     loginSeller,
     loginAdmin,
-    createAdmin
+    createAdmin,
+    acceptSeller,
+    getSellersRequests
 };

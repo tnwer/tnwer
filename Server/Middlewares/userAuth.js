@@ -8,6 +8,7 @@ async function authorize(req, res, next) {
         if (authHeader) {
             const token = authHeader.split(' ')[1];
             const user = jwt.verify(token, process.env.SECRET_KEY);
+            logger.info(`user: ${user.id}`);
             if (user.id) {
                 req.user = user;
                 next();
