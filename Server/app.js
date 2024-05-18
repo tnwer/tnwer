@@ -28,7 +28,7 @@ app.use(reactionroutes);
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => logger.info('Connected to MongoDB'))
   .catch((error) => console.error('MongoDB connection error:', error));
-const product = require('./Model/product');
+
 app.listen(process.env.PORT, () => {
     logger.info(`Server is running on port ${process.env.PORT}`);
 });

@@ -118,25 +118,18 @@ async function getActiveUsers(req, res){
 
 async function updateUserData(req, res) {
     try {
-        const userID = req.params.id;
+        const userID = req.user.id;
         const { user_name, password, phone_number } = req.body;
         const user_image = res.locals.site || null;
-        let theUser = await userModel.findById(userID);
-        bcrypt.compare(password, theUser.password, async (error, result) => {
-            if (error) {
-                res.status(400).json(error);
-            } else if (result) {
-                theUser = await userModel.findByIdAndUpdate(userID, {
-                    user_name: user_name,
-                    phone_number: phone_number,
-                    profile_img: user_image, 
-                }, { new: true });
-                theUser.save();
-                res.status(200).json({ theUser });
-            } else {
-                res.status(400).json('Incorrect password');
-            }
-        });
+        const user_password = await bcrypt.hash(password, 10);
+        const theUser = await userModel.findByIdAndUpdate(userID, {
+                user_name: user_name,
+                phone_number: phone_number,
+                profile_img: user_image, 
+                password: user_password,
+            }, { new: true });
+        theUser.save();
+        res.status(200).json({ theUser });
     } catch (error) {
         console.log(error);
         res.status(500).json({error: 'Error in updating user data'});
@@ -285,7 +278,7 @@ async function loginAdmin (req, res){
                     if (error) {
                         res.status(400).json(error);
                     } else if (result) {
-                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
+                        const accessToken = jwt.sign({id : user._id, role : user.user_role}, process.env.SECRET_KEY, {expiresIn: '4h'});
                         res.cookie('accessToken', accessToken, { httpOnly: true });
                         res.status(200).json({ accessToken });
                     } else {

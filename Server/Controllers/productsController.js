@@ -17,7 +17,7 @@ async function addProduct(req, res){
             product_category: category,
             img_url: user_img,
             product_count: product_count,
-            product_owner: owner,
+            product_owner: userID,
             product_location: product_location,
             shop_name: shop_name,
         });
@@ -44,8 +44,12 @@ async function getProductDetails(req, res){
         const productID = req.params.id;
         const productDetails = await productModel.findById(productID).where({
             is_deleted: false,
-        }).populate('product_category').populate('discount').populate('comments');
-
+        }).populate('product_category').populate('discount').populate({
+            path: 'comments',
+            populate: {
+                path: 'comment_user',
+                model: 'User'
+            }});
         const userID = req.headers.user || null;
         let location;
         if(userID){
@@ -132,6 +136,25 @@ async function deleteDiscount(req, res){
     }
 };
 
+async function getSellerProducts(req, res){
+    try{
+        const userID = req.user.id;
+        const productDetails = await productModel.find().where({
+            is_deleted: false,
+            product_owner: userID,
+        }).populate('product_category').populate('discount').populate({
+                path: 'comments',
+                populate: {
+                    path: 'comment_user',
+                    model: 'User'
+            }});
+        res.status(200).json(productDetails);
+    }catch(error){
+        console.log(error);
+        res.status(500).json('error in get Seller Products');
+    }
+};
+
 module.exports = {
     addProduct,
     getAllProducts,
@@ -140,4 +163,5 @@ module.exports = {
     deleteProduct,
     addDiscount,
     deleteDiscount,
+    getSellerProducts
 };

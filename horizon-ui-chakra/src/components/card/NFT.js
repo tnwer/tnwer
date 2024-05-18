@@ -16,7 +16,7 @@ export default function NFT(props) {
   const textColor = useColorModeValue("navy.700", "white");
   const textColorBid = useColorModeValue("brand.500", "white");
   return (
-    <Card p='20px'>
+    <Card p='20px' w='300px'>
       <Flex direction={{ base: "column" }} justify='center'>
         <Box mb={{ base: "20px", "2xl": "20px" }} position='relative'>
           <Image
@@ -53,6 +53,7 @@ export default function NFT(props) {
                 me='14px'>
                 {name}
               </Text>
+              
               <Text
                 color='secondaryGray.600'
                 fontSize={{

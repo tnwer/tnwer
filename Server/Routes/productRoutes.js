@@ -14,8 +14,11 @@ router.put('/updateProduct/:id',
 router.put('/deleteProduct/:id', userAuth.authorize, productControllers.deleteProduct);
 router.post('/addDiscount/:id', sellerAuth.authorize, productControllers.addDiscount);
 router.put('/deleteDescount/:id', sellerAuth.authorize, productControllers.deleteDiscount);
+router.get('/deletedProducts/:id', userAuth.authorize, productControllers.deleteProduct);
 
 router.get('/getCategory', categoryController.getCategory);
 router.post('/addCategory', uploadImg.uploadImg, categoryController.addCategory);
+
+router.get('/getSellerProducts', sellerAuth.authorize, productControllers.getSellerProducts);
 
 module.exports = router;

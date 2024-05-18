@@ -35,7 +35,6 @@ async function getPayment(req, res){
         }else{
             for (let i = 0; i < allOrders.length; i++){
                 let theProduct = await productModel.findById(allOrders[i].cart_product);
-                // console.log(theProduct);
                 total = total + (theProduct.price * allOrders[i].quantity);
                 items.push({
                     price_data : {

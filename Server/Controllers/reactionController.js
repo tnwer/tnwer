@@ -5,7 +5,7 @@ const productModel = require('../Model/product');
 
 async function addRating(req, res){
     try{
-        const userID = '66350f9c54f679aba589a1ee';
+        const userID = req.user.id;
         const productID = req.params.id;
         const {userRating} = req.body;
 
@@ -58,7 +58,7 @@ async function addRating(req, res){
 
 async function addComment(req, res){
     try{
-        const userID = '66350f9c54f679aba589a1ee';
+        const userID = req.user.id;
         const productID = req.params.id;
         const {userComment} = req.body;
         const newComment = await commentModel.create({

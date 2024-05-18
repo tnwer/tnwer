@@ -25,7 +25,7 @@ const productSchema = new Schema({
     },
     shop_name: {
         type: String,
-        required: false
+        required: true
     },
     is_deleted: {
         type: Boolean,

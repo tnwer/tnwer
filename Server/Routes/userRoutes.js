@@ -17,7 +17,7 @@ router.post('/userRegister', userControllers.loginUser);
 router.get('/allUsers', userControllers.getAllUsers);
 router.get('/profilePage', userAuth.authorize, userControllers.getUserData);
 router.get('/activeUsers', adminAuth.authorize, userControllers.getActiveUsers);
-router.put('/updateUser/:id', userAuth.authorize,
+router.put('/updateUser', userAuth.authorize,
              uploadImg.uploadImg, userControllers.updateUserData);
 router.put('/deleteUser/:id', userAuth.authorize, userControllers.deleteUser);
 
