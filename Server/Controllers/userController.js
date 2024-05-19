@@ -36,6 +36,7 @@ async function createUser(req, res){
                 user_location : user_location,
                 user_role: 1,
                 phone_number: phone_number || '07777777777',
+                profile_img: process.env.USER_IMAGE,
             });
             const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role},
                                              process.env.SECRET_KEY, {expiresIn: '6h'});
@@ -120,14 +121,13 @@ async function getActiveUsers(req, res){
 async function updateUserData(req, res) {
     try {
         const userID = req.user.id;
-        const { user_name, password, phone_number } = req.body;
+        const { user_name, phone_number, user_location } = req.body;
         const user_image = res.locals.site || null;
-        const user_password = await bcrypt.hash(password, 10);
         const theUser = await userModel.findByIdAndUpdate(userID, {
                 user_name: user_name,
                 phone_number: phone_number,
-                profile_img: user_image, 
-                password: user_password,
+                profile_img: user_image,
+                user_location: user_location,
             }, { new: true });
         theUser.save();
         res.status(200).json({ theUser });
@@ -172,9 +172,13 @@ async function getWishist(req, res){
         const wishlist = await wishlistModel.findOne().where({
             user: userID,
         });
-        const wishlistProducts = await productModel.find({ _id: { $in: wishlist.products } });
-        res.status(200).json(wishlistProducts);
+        if(wishlist != null){
+            res.status(200).json(wishlistProducts);
+        }else{
+            res.status(200).json("empty wishlist");
+        }
     }catch(error){
+        console.log(error);
         res.status(500).json({error: 'error in get wishlist'});
     }
 };
@@ -218,6 +222,7 @@ async function createSeller(req, res){
                   Commercial_Record: Commercial_Record,
                   phone_number: phone_number || '07777777777',
                   is_deleted: true,
+                  profile_img: process.env.USER_IMAGE,
               });
               const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
               res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
@@ -338,6 +343,7 @@ async function createAdmin(req, res){
                   user_location : user_location,
                   user_role: 3,
                   phone_number: phone_number || '07777777777',
+                  profile_img: process.env.USER_IMAGE,
               });
               const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role},
                                              process.env.SECRET_KEY, {expiresIn: '6h'});
@@ -381,6 +387,43 @@ async function getSellersRequests(req, res){
     }
 };
 
+async function updateUserPassword(req, res) {
+    try {
+        const userID = req.user.id;
+        const { newPassword, userPassword } = req.body;
+        if (!newPassword || !userPassword) {
+            return res.status(400).json({ error: "New password and current password are required" });
+        }
+        let user = await userModel.findById(userID);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (!user.password) {
+            return res.status(400).json({ error: "User password is not set" });
+        }
+        let isMatch = bcrypt.compare(userPassword , user.password, (error, result) => {
+            if (error) {
+                return false;
+            } else if (result && user.is_deleted === false) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+        if (isMatch == false) {
+            return res.status(400).json({ error: "Incorrect password" });
+        }
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+        user.password = hashedPassword;
+        await user.save();
+        res.status(201).json("Password changed successfully");
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Error in changing the user password" });
+    }
+};
+
 module.exports = {
     createUser,
     loginUser,
@@ -397,5 +440,6 @@ module.exports = {
     loginAdmin,
     createAdmin,
     acceptSeller,
-    getSellersRequests
+    getSellersRequests,
+    updateUserPassword,
 };

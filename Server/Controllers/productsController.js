@@ -29,15 +29,17 @@ async function addProduct(req, res){
     }
 };
 
-async function getAllProducts(req, res){
-    try{
-        const allProducts = await productModel.find().where({
+async function getAllProducts(req, res) {
+    try {
+        const allProducts = await productModel.find({
             is_deleted: false,
+            product_count: { $gt: 0 }
         }).populate('product_category').populate('discount');
+        
         res.status(200).json(allProducts);
-    }catch(error){
+    } catch (error) {
         console.log(error);
-        res.status(500).json({error :"error in get All Products"});
+        res.status(500).json({ error: "error in get All Products" });
     }
 };
 

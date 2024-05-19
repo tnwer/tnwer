@@ -18,6 +18,7 @@ router.get('/allUsers', userControllers.getAllUsers);
 router.get('/profilePage', userAuth.authorize, userControllers.getUserData);
 router.get('/activeUsers', adminAuth.authorize, userControllers.getActiveUsers);
 router.put('/updateUser', userAuth.authorize, uploadImg.uploadImg, userControllers.updateUserData);
+router.put('/updatePassword', userAuth.authorize, userControllers.updateUserPassword)
 router.put('/deleteUser/:id', userAuth.authorize, userControllers.deleteUser);
 
 router.get('/wishlist', userAuth.authorize, userControllers.getWishist);

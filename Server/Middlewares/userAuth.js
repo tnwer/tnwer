@@ -19,6 +19,7 @@ async function authorize(req, res, next) {
             res.status(401).json("You need to log in first");
         }
     } catch (error) {
+        console.log(error);
         res.status(400).json({error: "Error in user authentication"});
     }
 };

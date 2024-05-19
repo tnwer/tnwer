@@ -75,11 +75,25 @@ async function afterPayment(req, res){
             product_id: order.cart_product,
             quantity: order.quantity 
         }));
+
         for(let i = 0; i < orders.length; i++){
             orders[i].is_deleted = true;
             orders[i].is_payed = true;
             await orders[i].save();
         };
+
+        const productIds = paymentProducts.map(p => p.product_id);
+        const productsDecremint = await productModel.find({ _id: { $in: productIds } });
+
+        for (let i = 0; i < productsDecremint.length; i++) {
+            const product = productsDecremint[i];
+            const paymentProduct = paymentProducts.find(p => p.product_id.toString() === product._id.toString());
+            if (paymentProduct) {
+                product.product_count -= paymentProduct.quantity;
+                await product.save();
+            }
+        }
+        
         for(let i = 0; i < orders.length; i++){
             const payment = await paymentModel.create({
                 payment_At: new Date(),
