@@ -30,33 +30,43 @@ async function getImageDownloadUrl(imageName) {
     }
 };
 
-function uploadImg(req, res, next){
+function uploadImg(req, res, next) {
     try {
-            upload.single('image')(req, res, async function (err) {
-                if (err) {
-                    console.error('Error uploading image:', err);
-                    res.status(500).send('Error uploading image.');
-                } else {
-                    const bucket = admin.storage().bucket();
-                    const imageBuffer = req.file.buffer;
-                    const imageName = req.file.originalname;
-                    const file = bucket.file(imageName);
-                    const fileType = req.file.mimetype;
-                    const result = await file.save(imageBuffer, { contentType: fileType });
-                    const Name = imageName;
-                    getImageDownloadUrl(Name)
-                      .then(url => {
+        upload.single('image')(req, res, async function (err) {
+            if (err) {
+                console.error('Error uploading image:', err);
+                return res.status(500).send('Error uploading image.');
+            }
+            console.log(req.file)
+            if (req.file == undefined) {
+                console.error('No image file provided');
+                res.locals.site = req.body.image;
+                return next();
+            }
+            try {
+                const bucket = admin.storage().bucket();
+                const imageBuffer = req.file.buffer;
+                const imageName = req.file.originalname;
+                const file = bucket.file(imageName);
+                const fileType = req.file.mimetype;
+                await file.save(imageBuffer, { contentType: fileType });
+                getImageDownloadUrl(imageName)
+                    .then(url => {
                         res.locals.site = url;
                         next();
-                      })
-                      .catch(error => {
-                        console.error('Error:', error);
-                      });
-                }
-            });
+                    })
+                    .catch(error => {
+                        console.error('Error getting image download URL:', error);
+                        res.status(500).send('Error getting image download URL.');
+                    });
+            } catch (uploadError) {
+                console.error('Error uploading image:', uploadError);
+                res.status(500).send('Error uploading image.');
+            }
+        });
     } catch (error) {
-      console.error('Error uploading image:', error);
-      res.status(500).send('Error uploading image.');
+        console.error('Error uploading image:', error);
+        res.status(500).send('Error uploading image.');
     }
 };
 

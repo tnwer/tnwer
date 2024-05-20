@@ -36,7 +36,7 @@ async function createUser(req, res){
                 user_location : user_location,
                 user_role: 1,
                 phone_number: phone_number || '07777777777',
-                profile_img: process.env.USER_IMAGE,
+                profile_img: 'https://firebasestorage.googleapis.com/v0/b/giftify-894d5.appspot.com/o/profile-default-icon-2048x2045-u3j7s5nj.png?alt=media&token=36c1eba1-4b08-429f-b03d-bcfcf8d58d73',
             });
             const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role},
                                              process.env.SECRET_KEY, {expiresIn: '6h'});
@@ -173,9 +173,11 @@ async function getWishist(req, res){
             user: userID,
         });
         if(wishlist != null){
-            res.status(200).json(wishlistProducts);
+            const productIDs = wishlist.products;
+            const products = await productModel.find({ _id: { $in: productIDs } });
+            res.status(200).json(products);
         }else{
-            res.status(200).json("empty wishlist");
+            res.status(200).json([]);
         }
     }catch(error){
         console.log(error);
@@ -222,7 +224,7 @@ async function createSeller(req, res){
                   Commercial_Record: Commercial_Record,
                   phone_number: phone_number || '07777777777',
                   is_deleted: true,
-                  profile_img: process.env.USER_IMAGE,
+                  profile_img: 'https://firebasestorage.googleapis.com/v0/b/giftify-894d5.appspot.com/o/profile-default-icon-2048x2045-u3j7s5nj.png?alt=media&token=36c1eba1-4b08-429f-b03d-bcfcf8d58d73'
               });
               const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role}, process.env.SECRET_KEY, {expiresIn: '6h'});
               res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
@@ -343,7 +345,7 @@ async function createAdmin(req, res){
                   user_location : user_location,
                   user_role: 3,
                   phone_number: phone_number || '07777777777',
-                  profile_img: process.env.USER_IMAGE,
+                  profile_img: 'https://firebasestorage.googleapis.com/v0/b/giftify-894d5.appspot.com/o/profile-default-icon-2048x2045-u3j7s5nj.png?alt=media&token=36c1eba1-4b08-429f-b03d-bcfcf8d58d73'
               });
               const accessToken = jwt.sign({id : newUser._id, role: newUser.user_role},
                                              process.env.SECRET_KEY, {expiresIn: '6h'});
