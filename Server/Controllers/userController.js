@@ -122,7 +122,7 @@ async function updateUserData(req, res) {
     try {
         const userID = req.user.id;
         const { user_name, phone_number, user_location } = req.body;
-        const user_image = res.locals.site || null;
+        const user_image = res.locals.site || req.body.image;
         const theUser = await userModel.findByIdAndUpdate(userID, {
                 user_name: user_name,
                 phone_number: phone_number,
