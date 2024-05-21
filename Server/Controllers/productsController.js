@@ -44,8 +44,8 @@ async function getAllProducts(req, res) {
     }
 };
 
-async function getProductDetails(req, res){
-    try{
+async function getProductDetails(req, res) {
+    try {
         const productID = req.params.id;
         const productDetails = await productModel.findById(productID).where({
             is_deleted: false,
@@ -54,35 +54,53 @@ async function getProductDetails(req, res){
             populate: {
                 path: 'comment_user',
                 model: 'User'
-            }});
+            }
+        });
+
         const userID = req.headers.user || null;
         let location;
-        if(userID){
+        if (userID) {
             let user = await userModel.findById(userID);
             location = user.user_location;
-        }else{
+        } else {
             location = productDetails.product_location;
         }
 
+        const price = productDetails.price;
         const productName = productDetails.product_name;
+        const productNameWords = productName.split(' ');
+        const productNameRegexArray = productNameWords.map(word => new RegExp(word, 'i'));
+
         const relatedProducts = await productModel.find({
             product_category: productDetails.product_category,
             _id: { $ne: productDetails._id },
-            product_name: { $regex: productName } 
-        }).limit(4);
+            price: { $lt: price },
+            is_deleted: false,
+            // product_location: location,
+        }).sort({ price: 1 }).limit(8);
 
-        const price = productDetails.price;
-        const bestOfProduct = await productModel.find({
+        let bestOfProduct = await productModel.find({
             product_category: productDetails.product_category._id,
-            product_location: location,
             _id: { $ne: productDetails._id },
-            price: { $lt: price }
-        }).sort({ price: 1 }).limit(3);
+            price: { $lt: price },
+            is_deleted: false,
+            $or: productNameRegexArray.map(regex => ({ product_name: regex }))
+        }).sort({ price: 1 }).limit(8);
 
-        res.status(200).json({ productDetails, relatedProducts, bestOfProduct , userID});
-    } catch(error){
+        if(bestOfProduct.length == 0){
+            bestOfProduct = await productModel.find({
+                product_category: productDetails.product_category._id,
+                _id: { $ne: productDetails._id },
+                // price: { $lt: price },
+                is_deleted: false,
+                $or: productNameRegexArray.map(regex => ({ product_name: regex }))
+            }).sort({ price: 1 }).limit(8);
+        }
+
+        res.status(200).json({ productDetails, relatedProducts, bestOfProduct, userID });
+    } catch (error) {
         console.error(error);
-        res.status(500).json({error: "Error in get Details"});
+        res.status(500).json({ error: "Error in get Details" });
     }
 };
 

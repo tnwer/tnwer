@@ -9,7 +9,7 @@ router.post('/adminRegister', userControllers.createAdmin);
 router.post('/adminLogin', userControllers.loginAdmin);
 
 router.post('/sellerLogin', userControllers.loginSeller);
-router.post('/sellerSignUp', userControllers.createSeller);
+router.post('/sellerSignUp', uploadImg.uploadImg, userControllers.createSeller);
 
 router.post('/userLogin', userControllers.createUser);
 router.post('/userRegister', userControllers.loginUser);

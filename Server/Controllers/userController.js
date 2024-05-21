@@ -210,7 +210,8 @@ async function deleteFromWishlist(req, res){
 
 async function createSeller(req, res){
     try {
-      const { user_name, user_email, password, phone_number, user_location, Commercial_Record} = req.body;
+      const Commercial_Record = res.locals.site;
+      const { user_name, user_email, password, phone_number, user_location } = req.body;
       const valid = validation(user_name, user_email, password, phone_number);
       if (valid){
           let user_password = await bcrypt.hash(password, 10);

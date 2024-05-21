@@ -5,12 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 const cors = require('cors');
 const logger = require('./log/logger');
-
-const userRoutes = require('./Routes/userRoutes');
-const productRoutes = require('./Routes/productRoutes');
-const cartRoutes = require('./Routes/cartRoutes');
-const paymentRoutes = require('./Routes/paymentRoutes');
-const reactionroutes = require('./Routes/reactionRoutes');
+const routes = require('./Routes/routes');
 
 require('dotenv').config();
 app.use(express.json());
@@ -18,16 +13,13 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use(userRoutes);
-app.use(productRoutes);
-app.use(cartRoutes);
-app.use(paymentRoutes);
-app.use(reactionroutes);
+app.use(routes.productRoutes);
+app.use(routes.userRoutes);
+app.use(routes.cartRoutes);
+app.use(routes.reactionroutes);
+app.use(routes.paymentRoutes);
 
-// mongoose.connect(process.env.MONGODB_URI);
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => logger.info('Connected to MongoDB'))
-  .catch((error) => console.error('MongoDB connection error:', error));
+mongoose.connect(process.env.MONGODB_URI);
 
 app.listen(process.env.PORT, () => {
     logger.info(`Server is running on port ${process.env.PORT}`);
