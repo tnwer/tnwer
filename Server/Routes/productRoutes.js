@@ -11,12 +11,14 @@ router.get('/allProducts', productControllers.getAllProducts);
 router.get('/productDetails/:id', productControllers.getProductDetails);
 router.put('/updateProduct/:id', sellerAuth.authorize, uploadImg.uploadImg, productControllers.updateProduct);
 router.put('/deleteProduct/:id', userAuth.authorize, productControllers.deleteProduct);
+router.get('/deletedProducts', productControllers.deletedProducts);
 
 router.post('/addDiscount/:id', sellerAuth.authorize, productControllers.addDiscount);
 router.put('/deleteDescount/:id', sellerAuth.authorize, productControllers.deleteDiscount);
 
 router.get('/getCategory', categoryController.getCategory);
 router.post('/addCategory', uploadImg.uploadImg, categoryController.addCategory);
+router.put('/deleteCategory/:id', categoryController.deleteCategory);
 
 router.get('/getSellerProducts', sellerAuth.authorize, productControllers.getSellerProducts);
 

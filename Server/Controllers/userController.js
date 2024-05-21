@@ -427,6 +427,30 @@ async function updateUserPassword(req, res) {
     }
 };
 
+async function getRegUsers(req, res){
+    try{
+        const users = await userModel.find().where({
+            user_role: 1,
+        });
+        res.status(200).json({users: users});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Error in get RegUsers" });
+    }
+};
+
+async function getSellers(req, res){
+    try{
+        const sellers = await userModel.find().where({
+            user_role: 2,
+        });
+        res.status(200).json({users: sellers});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Error in get RegUsers" });
+    }
+};
+
 module.exports = {
     createUser,
     loginUser,
@@ -445,4 +469,6 @@ module.exports = {
     acceptSeller,
     getSellersRequests,
     updateUserPassword,
+    getRegUsers,
+    getSellers,
 };

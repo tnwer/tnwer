@@ -20,7 +20,7 @@ import {
     useEffect(() => {
       const fetchUsers = async () => {
         try {
-          const response = await fetch('http://localhost:8080/allUsers');
+          const response = await fetch('http://localhost:8080/getRegUsers');
           const { users } = await response.json();
           setTableData(users);
         } catch (error) {

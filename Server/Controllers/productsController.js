@@ -195,6 +195,18 @@ async function getSellerProducts(req, res){
     }
 };
 
+async function deletedProducts(req, res){
+    try{
+        const DeletedProducts = await productModel.find().where({
+            is_deleted: true,
+        });
+        res.status(200).json(DeletedProducts);
+    }catch(error){
+        console.log(error);
+        res.status(500).json('error in get deleted Products');
+    }
+}
+
 module.exports = {
     addProduct,
     getAllProducts,
@@ -203,5 +215,6 @@ module.exports = {
     deleteProduct,
     addDiscount,
     deleteDiscount,
-    getSellerProducts
+    getSellerProducts,
+    deletedProducts
 };

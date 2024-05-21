@@ -25,7 +25,21 @@ async function addCategory(req, res){
     }
 };
 
+async function deleteCategory(req, res){
+    try{
+        const categoryID = req.params.id;
+        const deletedCategory = await categoryModel.deleteOne().where({
+            _id: categoryID,
+        });
+        res.status(201).json(deletedCategory);
+    }catch(error){
+        console.log(error);
+        res.status(500).json('error in deleteC ategory');
+    }
+}
+
 module.exports = {
     getCategory,
     addCategory,
+    deleteCategory
 }

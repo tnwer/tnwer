@@ -28,4 +28,7 @@ router.delete('/deleteFromWishlist/:id', userAuth.authorize, userControllers.del
 router.put('/sellerAccept/:id', adminAuth.authorize, userControllers.acceptSeller);
 router.get('/sellersRequests', userControllers.getSellersRequests);
 
+router.get('/getRegUsers', userControllers.getRegUsers);
+router.get('/getSellers', userControllers.getSellers);
+
 module.exports = router;
